@@ -7,10 +7,12 @@
  */
 namespace Spiral\Profiler;
 
+use Monolog\Handler\HandlerInterface;
 use Spiral\Core\Bootloaders\Bootloader;
 use Spiral\Core\FactoryInterface;
+use Spiral\Debug\Benchmarker;
 use Spiral\Debug\BenchmarkerInterface;
-use Spiral\Debug\Debugger;
+use Spiral\Debug\LogManager;
 use Spiral\Http\HttpDispatcher;
 
 /**
@@ -23,22 +25,39 @@ class ProfilerPanel extends Bootloader
      */
     const BOOT = true;
 
-    /**
-     * @var array
-     */
-    protected $bindings = [
-        //To enable profiling
-        BenchmarkerInterface::class => Debugger::class
+    const BINDINGS   = [
+        BenchmarkerInterface::class => Benchmarker::class
+    ];
+
+    const SINGLETONS = [
+        MemoryHandler::class => [self::class, 'memoryHandler']
     ];
 
     /**
-     * @param HttpDispatcher   $dispatcher
+     * @param LogManager       $logs
+     * @param MemoryHandler    $handler
+     * @param HttpDispatcher   $http
      * @param FactoryInterface $factory
      */
-    public function boot(HttpDispatcher $dispatcher, FactoryInterface $factory)
+    public function boot(
+        LogManager $logs,
+        MemoryHandler $handler,
+        HttpDispatcher $http,
+        FactoryInterface $factory
+    ) {
+        //Enabling memory logging for whole application
+        $logs->shareHandler($handler);
+
+        $http->riseMiddleware(
+            $factory->make(ProfilerWrapper::class, ['started' => microtime(true)])
+        );
+    }
+
+    /**
+     * @return HandlerInterface
+     */
+    public function memoryHandler(): HandlerInterface
     {
-        $dispatcher->riseMiddleware($factory->make(ProfilerWrapper::class, [
-            'started' => microtime(true)
-        ]));
+        return new MemoryHandler();
     }
 }
