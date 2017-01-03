@@ -25,28 +25,28 @@ class ProfilerPanel extends Bootloader
      */
     const BOOT = true;
 
-    const BINDINGS   = [
+    const BINDINGS = [
         BenchmarkerInterface::class => Benchmarker::class
     ];
 
     const SINGLETONS = [
-        MemoryHandler::class => [self::class, 'memoryHandler']
+        DebugHandler::class => [self::class, 'debugHandler']
     ];
 
     /**
      * @param LogManager       $logs
-     * @param MemoryHandler    $handler
+     * @param DebugHandler     $handler
      * @param HttpDispatcher   $http
      * @param FactoryInterface $factory
      */
     public function boot(
         LogManager $logs,
-        MemoryHandler $handler,
+        DebugHandler $handler,
         HttpDispatcher $http,
         FactoryInterface $factory
     ) {
         //Enabling memory logging for whole application
-        $logs->shareHandler($handler);
+        $logs->debugHandler($handler);
 
         $http->riseMiddleware(
             $factory->make(ProfilerWrapper::class, ['started' => microtime(true)])
@@ -56,8 +56,8 @@ class ProfilerPanel extends Bootloader
     /**
      * @return HandlerInterface
      */
-    public function memoryHandler(): HandlerInterface
+    public function debugHandler(): HandlerInterface
     {
-        return new MemoryHandler();
+        return new DebugHandler();
     }
 }

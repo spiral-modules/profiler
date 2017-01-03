@@ -59,14 +59,14 @@ class ProfilerWrapper implements MiddlewareInterface
     /**
      * @param float              $started
      * @param ViewsInterface     $views
-     * @param MemoryHandler      $handler
+     * @param DebugHandler       $handler
      * @param Benchmarker        $benchmarker
      * @param ContainerInterface $container
      */
     public function __construct(
         float $started,
         ViewsInterface $views,
-        MemoryHandler $handler,
+        DebugHandler $handler,
         Benchmarker $benchmarker,
         ContainerInterface $container
     ) {

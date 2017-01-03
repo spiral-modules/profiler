@@ -11,7 +11,7 @@ use Monolog\Handler\AbstractHandler;
 /**
  * Aggregates log messages into memory.
  */
-class MemoryHandler extends AbstractHandler
+class DebugHandler extends AbstractHandler
 {
     /**
      * @var array
